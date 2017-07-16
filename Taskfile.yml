@@ -1,0 +1,5 @@
+# github.com/go-task/task
+
+default:
+  cmds:
+    - echo "Hello, World!"
