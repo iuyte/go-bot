@@ -1,5 +1,15 @@
 # github.com/go-task/task
 
 default:
+  deps:
+    - build
+
+build:
   cmds:
-    - echo "Hello, World!"
+    - go build -v -i ./*.go
+
+run:
+  deps:
+    - build
+  cmds:
+    - go run ./*.go
