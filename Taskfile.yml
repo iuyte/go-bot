@@ -2,31 +2,30 @@
 
 default:
   cmds:
-    - task: build
-      vars: {PROJECT_NAME: "{{.PROJECT_NAME}}", MAIN_NAME: "{{.MAIN_NAME}}"}
-  vars:
-    PROJECT_NAME:
-      sh: basename `pwd`
-    MAIN_NAME:
-      sh: for FILE in *.go; do echo $FILE; break; done
+  - task: build
 
 clean:
+  desc: Clear files built by the project
   cmds:
     - rm -rf bin
 
 build:
-  deps:
-    - clean
+  desc: Build the project
   cmds:
+    - task: print
+      vars: {TEXT: "Building {{.PROJECT_NAME}}"}
+    - task: clean
     - mkdir bin
     - go build -v -i -o bin/{{.PROJECT_NAME}} {{.MAIN_NAME}}
 
 run:
-  deps:
-    - build
+  desc: Run the project executable
   cmds:
+    - task: print
+      vars: {TEXT: "Running project {{.PROJECT_NAME}}"}
     - bin/{{.PROJECT_NAME}}
-  vars:    
-    PROJECT_NAME:
-      sh: basename `pwd`
 
+print:
+  desc: Prints the specified TEXT colorfully (for in-Taskfile use only)
+  cmds:
+    - "###### {{.TEXT}} ######"

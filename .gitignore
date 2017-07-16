@@ -139,8 +139,4 @@ Session.vim
 # auto-generated tag files
 tags
 
-# Project Specific
-main
-
 # End of https://www.gitignore.io/api/go,vim,emacs,intellij
-bin

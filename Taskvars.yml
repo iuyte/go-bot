@@ -1,0 +1,6 @@
+PROJECT_NAME:
+  sh: basename `pwd`
+
+MAIN_NAME:
+  sh: for i in ./*.go; do echo $i; break; done
+
