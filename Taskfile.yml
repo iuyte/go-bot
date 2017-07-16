@@ -1,21 +1,32 @@
 # github.com/go-task/task
 
 default:
-  deps:
-    - build
+  cmds:
+    - task: build
+      vars: {PROJECT_NAME: "{{.PROJECT_NAME}}", MAIN_NAME: "{{.MAIN_NAME}}"}
+  vars:
+    PROJECT_NAME:
+      sh: basename `pwd`
+    MAIN_NAME:
+      sh: for FILE in *.go; do echo $FILE; break; done
+
+clean:
+  cmds:
+    - rm -rf bin
 
 build:
   deps:
     - clean
   cmds:
-    - go build -i ./*.go
+    - mkdir bin
+    - go build -v -i -o bin/{{.PROJECT_NAME}} {{.MAIN_NAME}}
 
 run:
   deps:
     - build
   cmds:
-    - ./main
+    - bin/{{.PROJECT_NAME}}
+  vars:    
+    PROJECT_NAME:
+      sh: basename `pwd`
 
-clean:
-  cmds:
-    - rm -f main
