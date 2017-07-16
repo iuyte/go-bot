@@ -5,11 +5,17 @@ default:
     - build
 
 build:
+  deps:
+    - clean
   cmds:
-    - go build -v -i ./*.go
+    - go build -i ./*.go
 
 run:
   deps:
     - build
   cmds:
-    - go run ./*.go
+    - ./main
+
+clean:
+  cmds:
+    - rm -f main
