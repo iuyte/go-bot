@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
-	"os/exec"
+	// "os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -156,6 +156,7 @@ func guildCreate(s *discordgo.Session, event *discordgo.GuildCreate) {
 }
 
 func downloadSound(url string) bool {
+  /*
 	if out, err := exec.Command("./download.sh", url).Output(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		fmt.Println(out)
@@ -164,6 +165,8 @@ func downloadSound(url string) bool {
 		fmt.Println(out)
 		return true
 	}
+  */
+  return true
 }
 
 // loadSound attempts to load an encoded sound file from disk.
@@ -177,7 +180,6 @@ func loadSound(sound string) error {
 	}
 
 	var opuslen int16
-	binary.Read(file, binary.LittleEndian, &_)
 
 	for {
 		err = binary.Read(file, binary.LittleEndian, &opuslen)
