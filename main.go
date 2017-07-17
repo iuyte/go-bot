@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"os/signal"
 	"strings"
 	"syscall"
@@ -23,21 +24,22 @@ func Token() string {
 	return strings.Split(c, ";")[0]
 }
 
+const prefix string = "go play "
+
 var token string
 var buffer = make([][]byte, 0)
 
 func main() {
-  token = Token()
+	token = Token()
 	if token == "" {
-    fmt.Println("No token provided. Please place a token followed by a ';' at ../token.txt")
+		fmt.Println("No token provided. Please place a token followed by a ';' at ../token.txt")
 		return
 	}
 
 	// Load the sound file.
-	err := loadSound()
+	err := loadSound("./resource/music.dca")
 	if err != nil {
 		fmt.Println("Error loading sound: ", err)
-		fmt.Println("Please copy $GOPATH/src/github.com/bwmarrin/examples/airhorn/airhorn.dca to this directory.")
 		return
 	}
 
@@ -92,7 +94,7 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// check if the message is "!airhorn"
-	if strings.HasPrefix(m.Content, "!airhorn") {
+	if strings.HasPrefix(m.Content, prefix) {
 
 		// Find the channel that the message came from.
 		c, err := s.State.Channel(m.ChannelID)
@@ -105,6 +107,14 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		g, err := s.State.Guild(c.GuildID)
 		if err != nil {
 			// Could not find guild.
+			return
+		}
+
+		url := strings.Split(m.Content, " ")
+		dsu := downloadSound(url[len(url)])
+		terr := loadSound("./resource/music.dca")
+		if terr != nil || !dsu {
+			fmt.Println("Error loading sound: ", terr)
 			return
 		}
 
@@ -138,10 +148,29 @@ func guildCreate(s *discordgo.Session, event *discordgo.GuildCreate) {
 	}
 }
 
-// loadSound attempts to load an encoded sound file from disk.
-func loadSound() error {
+func downloadSound(url string) bool {
+	var retrieved, converted bool
+	cmd := exec.Command("youtube-dl", "-o resource/music.mp3", url, "-x --audio-format 'mp3'")
+	if err := cmd.Run(); err != nil {
+		retrieved = true
+	} else {
+		retrieved = false
+	}
 
-	file, err := os.Open("airhorn.dca")
+	cmd = exec.Command("dca", "-i resource/music.mp3 > music.dca")
+	if err := cmd.Run(); err != nil {
+		converted = true
+	} else {
+		converted = false
+	}
+	return retrieved && converted
+}
+
+// loadSound attempts to load an encoded sound file from disk.
+func loadSound(sound string) error {
+
+	buffer = make([][]byte, 0)
+	file, err := os.Open(sound)
 	if err != nil {
 		fmt.Println("Error opening dca file :", err)
 		return err
