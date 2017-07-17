@@ -20,7 +20,6 @@ const prefix string = "go play "
 var (
 	token  string
 	buffer = make([][]byte, 0)
-	vc     *discordgo.VoiceConnection
 )
 
 func main() {
@@ -111,9 +110,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		// url := strings.Split(m.Content, " ")[1]
-		// fmt.Println(url)
-		dsu := true // downloadSound(url)
+		url := strings.Split(m.Content, " ")[1]
+		dsu := downloadSound(url)
 		if !dsu {
 			fmt.Println("Error downloading")
 		}
@@ -121,13 +119,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		// Look for the message sender in that guild's current voice states.
 		for _, vs := range g.VoiceStates {
 			if vs.UserID == m.Author.ID {
-				if strings.Contains(m.Content, "join") {
-					vc, _ = s.ChannelVoiceJoin(g.ID, vs.ChannelID, false, false)
-					return
-				} else if strings.Contains(m.Content, "leave") {
-					vc.Disconnect()
-					return
-				}
 				err = playSound(s, g.ID, vs.ChannelID)
 				if err != nil {
 					fmt.Println("Error playing sound:", err)
@@ -156,7 +147,6 @@ func guildCreate(s *discordgo.Session, event *discordgo.GuildCreate) {
 }
 
 func downloadSound(url string) bool {
-  /*
 	if out, err := exec.Command("./download.sh", url).Output(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		fmt.Println(out)
@@ -165,8 +155,6 @@ func downloadSound(url string) bool {
 		fmt.Println(out)
 		return true
 	}
-  */
-  return true
 }
 
 // loadSound attempts to load an encoded sound file from disk.
@@ -212,6 +200,7 @@ func loadSound(sound string) error {
 // playSound plays the current buffer to the provided channel.
 func playSound(s *discordgo.Session, guildID, channelID string) (err error) {
 
+	vc, _ := s.ChannelVoiceJoin(guildID, channelID, false, false)
 	// Sleep for a specified amount of time before playing the sound
 	time.Sleep(250 * time.Millisecond)
 
@@ -225,6 +214,7 @@ func playSound(s *discordgo.Session, guildID, channelID string) (err error) {
 
 	// Stop speaking
 	vc.Speaking(false)
+	vc.Disconnect()
 
 	return nil
 }
