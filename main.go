@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// Load the sound file.
-	err := loadSound("./resource/airhorn.dca")
+	err := loadSound("./resource/music.dca")
 	if err != nil {
 		fmt.Println("Error loading sound: ", err)
 		return
@@ -83,7 +83,7 @@ func Token() string {
 func ready(s *discordgo.Session, event *discordgo.Ready) {
 
 	// Set the playing status.
-	s.UpdateStatus(0, "!music")
+	s.UpdateStatus(0, "go <youtube-url>")
 }
 
 // This function will be called (due to AddHandler above) every time a new
@@ -97,8 +97,6 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	if strings.Contains(m.Content, "go") {
-		fmt.Println("Command executing")
-
 		// Find the channel that the message came from.
 		c, err := s.State.Channel(m.ChannelID)
 		if err != nil {
@@ -113,9 +111,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		url := strings.Split(m.Content, " ")[1]
-		fmt.Println(url)
-		dsu := downloadSound(url)
+		// url := strings.Split(m.Content, " ")[1]
+		// fmt.Println(url)
+		dsu := true // downloadSound(url)
 		if !dsu {
 			fmt.Println("Error downloading")
 		}
@@ -181,10 +179,8 @@ func loadSound(sound string) error {
 	var opuslen int16
 
 	for {
-		// Read opus frame length from dca file.
 		err = binary.Read(file, binary.LittleEndian, &opuslen)
 
-		// If this is the end of the file, just return.
 		if err == io.EOF || err == io.ErrUnexpectedEOF {
 			err := file.Close()
 			if err != nil {
@@ -198,17 +194,14 @@ func loadSound(sound string) error {
 			return err
 		}
 
-		// Read encoded pcm from dca file.
 		InBuf := make([]byte, opuslen)
 		err = binary.Read(file, binary.LittleEndian, &InBuf)
 
-		// Should not be any end of file errors
 		if err != nil {
 			fmt.Println("Error reading from dca file :", err)
 			return err
 		}
 
-		// Append encoded pcm data to the buffer.
 		buffer = append(buffer, InBuf)
 	}
 }
