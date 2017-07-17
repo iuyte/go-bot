@@ -2,7 +2,7 @@
 
 default:
   cmds:
-  - task: build
+    - task: build
 
 clean:
   desc: Clear files built by the project
