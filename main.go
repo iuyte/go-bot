@@ -94,7 +94,8 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// check if the message is "!airhorn"
-	if strings.HasPrefix(m.Content, prefix) {
+	if strings.HasPrefix(m.Content, "go ") {
+		fmt.Println("Command executing")
 
 		// Find the channel that the message came from.
 		c, err := s.State.Channel(m.ChannelID)
@@ -110,8 +111,9 @@ func messageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 			return
 		}
 
-		url := strings.Split(m.Content, " ")
-		dsu := downloadSound(url[len(url)])
+		url := strings.Split(m.Content, " ")[1]
+		fmt.Println(url)
+		dsu := downloadSound(url)
 		terr := loadSound("./resource/music.dca")
 		if terr != nil || !dsu {
 			fmt.Println("Error loading sound: ", terr)
