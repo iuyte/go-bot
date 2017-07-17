@@ -177,6 +177,7 @@ func loadSound(sound string) error {
 	}
 
 	var opuslen int16
+	binary.Read(file, binary.LittleEndian, &_)
 
 	for {
 		err = binary.Read(file, binary.LittleEndian, &opuslen)
@@ -190,7 +191,7 @@ func loadSound(sound string) error {
 		}
 
 		if err != nil {
-			fmt.Println("Error reading from dca file :", err)
+			fmt.Println("Error reading from dca file:", err)
 			return err
 		}
 
@@ -198,7 +199,7 @@ func loadSound(sound string) error {
 		err = binary.Read(file, binary.LittleEndian, &InBuf)
 
 		if err != nil {
-			fmt.Println("Error reading from dca file :", err)
+			fmt.Println("Error reading from dca file:", err)
 			return err
 		}
 
